@@ -26,14 +26,14 @@ fn picture_key_custom_to_string() {
 
 #[test]
 fn picture_new() {
-    let picture = Picture::new();
+    let picture = Picture::<f64, f64>::new();
     assert!(picture.axes.is_empty());
     assert!(picture.keys.is_empty());
 }
 
 #[test]
 fn picture_add_key() {
-    let mut picture = Picture::new();
+    let mut picture = Picture::<f64, f64>::new();
     picture.add_key(PictureKey::Custom(String::from("random")));
     assert_eq!(picture.keys.len(), 1);
     assert_eq!(picture.keys[0].to_string(), String::from("random"));
@@ -46,7 +46,7 @@ fn picture_add_key() {
 
 #[test]
 fn picture_standalone_string() {
-    let picture = Picture::new();
+    let picture = Picture::<f64, f64>::new();
     assert_eq!(
         r#"\documentclass{standalone}
 \usepackage{pgfplots}
@@ -60,7 +60,7 @@ fn picture_standalone_string() {
 
 #[test]
 fn picture_to_string() {
-    let mut picture = Picture::new();
+    let mut picture = Picture::<f64, f64>::new();
     assert_eq!(
         picture.to_string(),
         "\\begin{tikzpicture}\n\\end{tikzpicture}"

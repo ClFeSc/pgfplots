@@ -45,7 +45,10 @@
 #[allow(unused_imports)]
 use crate::axis::{plot::PlotKey, AxisKey};
 
-use crate::axis::{plot::Plot2D, Axis};
+use crate::axis::{
+    plot::{coordinate::Coordinate, Plot2D},
+    Axis,
+};
 use rand::distributions::{Alphanumeric, DistString};
 use std::fmt;
 use std::io::Write;
@@ -126,12 +129,12 @@ impl fmt::Display for PictureKey {
 /// \end{tikzpicture}
 /// ```
 #[derive(Clone, Debug, Default)]
-pub struct Picture {
+pub struct Picture<X: Coordinate, Y: Coordinate> {
     keys: Vec<PictureKey>,
-    pub axes: Vec<Axis>,
+    pub axes: Vec<Axis<X, Y>>,
 }
 
-impl fmt::Display for Picture {
+impl<X: Coordinate, Y: Coordinate> fmt::Display for Picture<X, Y> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "\\begin{{tikzpicture}}")?;
         // If there are keys, print one per line. It makes it easier for a
@@ -155,20 +158,20 @@ impl fmt::Display for Picture {
     }
 }
 
-impl From<Axis> for Picture {
-    fn from(axis: Axis) -> Self {
+impl<X: Coordinate, Y: Coordinate> From<Axis<X, Y>> for Picture<X, Y> {
+    fn from(axis: Axis<X, Y>) -> Self {
         Self {
             keys: Vec::new(),
             axes: vec![axis],
         }
     }
 }
-impl From<Plot2D> for Picture {
-    fn from(plot: Plot2D) -> Self {
+impl<X: Coordinate, Y: Coordinate> From<Plot2D<X, Y>> for Picture<X, Y> {
+    fn from(plot: Plot2D<X, Y>) -> Self {
         Picture::from(Axis::from(plot))
     }
 }
-impl Picture {
+impl<X: Coordinate, Y: Coordinate> Picture<X, Y> {
     /// Create a new, empty picture environment.
     ///
     /// # Examples
@@ -176,7 +179,7 @@ impl Picture {
     /// ```
     /// use pgfplots::Picture;
     ///
-    /// let picture = Picture::new();
+    /// let picture = Picture::<f64, f64>::new();
     /// ```
     pub fn new() -> Self {
         Default::default()
@@ -189,7 +192,7 @@ impl Picture {
     /// ```
     /// use pgfplots::{Picture, PictureKey};
     ///
-    /// let mut picture = Picture::new();
+    /// let mut picture = Picture::<f64, f64>::new();
     /// picture.add_key(PictureKey::Custom(String::from("baseline")));
     /// ```
     pub fn add_key(&mut self, key: PictureKey) {
@@ -215,7 +218,7 @@ impl Picture {
     /// ```
     /// use pgfplots::Picture;
     ///
-    /// let picture = Picture::new();
+    /// let picture = Picture::<f64, f64>::new();
     /// assert_eq!(
     /// r#"\documentclass{standalone}
     /// \usepackage{pgfplots}
@@ -247,7 +250,7 @@ impl Picture {
     /// # fn main() -> Result<(), CompileError> {
     /// use pgfplots::{Engine, Picture};
     ///
-    /// let picture = Picture::new();
+    /// let picture = Picture::<f64, f64>::new();
     /// let pdf_path = picture.to_pdf(std::env::temp_dir(), "jobname", Engine::PdfLatex)?;
     ///
     /// assert_eq!(pdf_path, std::env::temp_dir().join("jobname.pdf"));
@@ -337,7 +340,7 @@ impl Picture {
     /// # fn main() -> Result<(), ShowPdfError> {
     /// use pgfplots::{Engine, Picture};
     ///
-    /// let picture = Picture::new();
+    /// let picture = Picture::<f64, f64>::new();
     /// picture.show_pdf(Engine::PdfLatex)?;
     ///
     /// # Ok(())

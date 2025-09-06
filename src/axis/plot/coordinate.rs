@@ -5,12 +5,29 @@ use std::fmt;
 #[allow(unused_imports)]
 use crate::axis::plot::{Plot2D, PlotKey};
 
+pub trait Coordinate: std::fmt::Display + std::default::Default {}
+impl Coordinate for String {}
+impl Coordinate for i8 {}
+impl Coordinate for u8 {}
+impl Coordinate for i16 {}
+impl Coordinate for u16 {}
+impl Coordinate for i32 {}
+impl Coordinate for u32 {}
+impl Coordinate for i64 {}
+impl Coordinate for u64 {}
+impl Coordinate for i128 {}
+impl Coordinate for u128 {}
+impl Coordinate for isize {}
+impl Coordinate for usize {}
+impl Coordinate for f32 {}
+impl Coordinate for f64 {}
+
 /// Coordinate in a two-dimensional plot.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 #[non_exhaustive]
-pub struct Coordinate2D {
-    pub x: f64,
-    pub y: f64,
+pub struct Coordinate2D<X: Coordinate, Y: Coordinate> {
+    pub x: X,
+    pub y: Y,
     /// By default, error bars are not drawn (even if it is a [`Some`]). These
     /// are only drawn if both [`PlotKey::XError`] and
     /// [`PlotKey::XErrorDirection`] are set in the [`Plot2D`].
@@ -24,7 +41,7 @@ pub struct Coordinate2D {
     // Is `point meta` skipped same as error when it is not set?
 }
 
-impl fmt::Display for Coordinate2D {
+impl<X: Coordinate, Y: Coordinate> fmt::Display for Coordinate2D<X, Y> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "({},{})", self.x, self.y)?;
 
@@ -38,7 +55,7 @@ impl fmt::Display for Coordinate2D {
     }
 }
 
-impl From<(f64, f64)> for Coordinate2D {
+impl<X: Coordinate, Y: Coordinate> From<(X, Y)> for Coordinate2D<X, Y> {
     /// Conversion from an `(x,y)` tuple into a two-dimensional coordinate.
     ///
     /// # Examples
@@ -46,14 +63,14 @@ impl From<(f64, f64)> for Coordinate2D {
     /// ```
     /// use pgfplots::axis::plot::coordinate::Coordinate2D;
     ///
-    /// let point: Coordinate2D = (1.0, -1.0).into();
+    /// let point: Coordinate2D<f64, f64> = (1.0, -1.0).into();
     ///
     /// assert_eq!(point.x, 1.0);
     /// assert_eq!(point.y, -1.0);
     /// assert!(point.error_x.is_none());
     /// assert!(point.error_y.is_none());
     /// ```
-    fn from(coordinate: (f64, f64)) -> Self {
+    fn from(coordinate: (X, Y)) -> Self {
         Coordinate2D {
             x: coordinate.0,
             y: coordinate.1,
@@ -63,7 +80,7 @@ impl From<(f64, f64)> for Coordinate2D {
     }
 }
 
-impl From<(f64, f64, Option<f64>, Option<f64>)> for Coordinate2D {
+impl<X: Coordinate, Y: Coordinate> From<(X, Y, Option<f64>, Option<f64>)> for Coordinate2D<X, Y> {
     /// Conversion from an `(x,y,error_x,error_y)` tuple into a two-dimensional
     /// coordinate.
     ///
@@ -72,14 +89,14 @@ impl From<(f64, f64, Option<f64>, Option<f64>)> for Coordinate2D {
     /// ```
     /// use pgfplots::axis::plot::coordinate::Coordinate2D;
     ///
-    /// let point: Coordinate2D = (1.0, -1.0, None, Some(3.0)).into();
+    /// let point: Coordinate2D<f64, f64> = (1.0, -1.0, None, Some(3.0)).into();
     ///
     /// assert_eq!(point.x, 1.0);
     /// assert_eq!(point.y, -1.0);
     /// assert!(point.error_x.is_none());
     /// assert_eq!(point.error_y.unwrap(), 3.0);
     /// ```
-    fn from(coordinate: (f64, f64, Option<f64>, Option<f64>)) -> Self {
+    fn from(coordinate: (X, Y, Option<f64>, Option<f64>)) -> Self {
         Coordinate2D {
             x: coordinate.0,
             y: coordinate.1,

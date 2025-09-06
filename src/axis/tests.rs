@@ -85,14 +85,14 @@ fn axis_key_y_mode_to_string() {
 
 #[test]
 fn axis_new() {
-    let axis = Axis::new();
+    let axis = Axis::<f64, f64>::new();
     assert!(axis.plots.is_empty());
     assert!(axis.keys.is_empty());
 }
 
 #[test]
 fn axis_set_title() {
-    let mut axis = Axis::new();
+    let mut axis = Axis::<f64, f64>::new();
     axis.set_title("Something");
     assert_eq!(axis.keys.len(), 1);
     assert!(matches!(axis.keys[0], AxisKey::Title(_)));
@@ -100,7 +100,7 @@ fn axis_set_title() {
 
 #[test]
 fn axis_set_x_label() {
-    let mut axis = Axis::new();
+    let mut axis = Axis::<f64, f64>::new();
     axis.set_x_label("Something");
     assert_eq!(axis.keys.len(), 1);
     assert!(matches!(axis.keys[0], AxisKey::XLabel(_)));
@@ -108,7 +108,7 @@ fn axis_set_x_label() {
 
 #[test]
 fn axis_set_y_label() {
-    let mut axis = Axis::new();
+    let mut axis = Axis::<f64, f64>::new();
     axis.set_y_label("Something");
     assert_eq!(axis.keys.len(), 1);
     assert!(matches!(axis.keys[0], AxisKey::YLabel(_)));
@@ -116,7 +116,7 @@ fn axis_set_y_label() {
 
 #[test]
 fn axis_add_key() {
-    let mut axis = Axis::new();
+    let mut axis = Axis::<f64, f64>::new();
     axis.add_key(AxisKey::YMode(Scale::Log));
     assert_eq!(axis.keys.len(), 1);
     assert_eq!(axis.keys[0].to_string(), String::from("ymode=log"));

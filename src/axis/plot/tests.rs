@@ -253,14 +253,14 @@ fn plot_key_y_error_direction_to_string() {
 
 #[test]
 fn plot_2d_new() {
-    let plot = Plot2D::new();
+    let plot = Plot2D::<f64, f64>::new();
     assert!(plot.coordinates.is_empty());
     assert!(plot.keys.is_empty());
 }
 
 #[test]
 fn plot_2d_add_key() {
-    let mut plot = Plot2D::new();
+    let mut plot = Plot2D::<f64, f64>::new();
     plot.add_key(PlotKey::Type2D(Type2D::SharpPlot));
     assert_eq!(plot.keys.len(), 1);
     assert_eq!(plot.keys[0].to_string(), String::from("sharp plot"));

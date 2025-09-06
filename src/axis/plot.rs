@@ -1,4 +1,4 @@
-use crate::axis::plot::coordinate::Coordinate2D;
+use crate::axis::plot::coordinate::{Coordinate, Coordinate2D};
 use std::fmt;
 
 // Only imported for documentation. If you notice that this is no longer the
@@ -69,7 +69,7 @@ impl fmt::Display for PlotKey {
 /// # fn main() -> Result<(), ShowPdfError> {
 /// use pgfplots::{axis::plot::Plot2D, Engine, Picture};
 ///
-/// let mut plot = Plot2D::new();
+/// let mut plot = Plot2D::<f64, f64>::new();
 /// plot.coordinates = (-100..100)
 ///     .into_iter()
 ///     .map(|i| (f64::from(i), f64::from(i*i)).into())
@@ -80,14 +80,15 @@ impl fmt::Display for PlotKey {
 /// # }
 /// ```
 #[derive(Clone, Debug, Default)]
-pub struct Plot2D {
+pub struct Plot2D<X: Coordinate, Y: Coordinate> {
     keys: Vec<PlotKey>,
-    pub coordinates: Vec<Coordinate2D>,
+    pub coordinates: Vec<Coordinate2D<X, Y>>,
+    is_plus: bool,
 }
 
-impl fmt::Display for Plot2D {
+impl<X: Coordinate, Y: Coordinate> fmt::Display for Plot2D<X, Y> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "\t\\addplot[")?;
+        write!(f, "\t\\addplot{}[", if self.is_plus { "+" } else { "" })?;
         // If there are keys, print them one per line. It makes it easier for a
         // human to find individual keys later.
         if !self.keys.is_empty() {
@@ -109,7 +110,7 @@ impl fmt::Display for Plot2D {
     }
 }
 
-impl Plot2D {
+impl<X: Coordinate, Y: Coordinate> Plot2D<X, Y> {
     /// Creates a new, empty two-dimensional plot.
     ///
     /// # Examples
@@ -117,7 +118,7 @@ impl Plot2D {
     /// ```
     /// use pgfplots::axis::plot::Plot2D;
     ///
-    /// let plot = Plot2D::new();
+    /// let plot = Plot2D::<f64, f64>::new();
     /// ```
     pub fn new() -> Self {
         Default::default()
@@ -130,7 +131,7 @@ impl Plot2D {
     /// ```
     /// use pgfplots::axis::plot::{Plot2D, PlotKey, Type2D::SharpPlot};
     ///
-    /// let mut plot = Plot2D::new();
+    /// let mut plot = Plot2D::<f64, f64>::new();
     /// plot.add_key(PlotKey::Type2D(SharpPlot));
     /// ```
     pub fn add_key(&mut self, key: PlotKey) {
@@ -147,6 +148,10 @@ impl Plot2D {
             }
         }
         self.keys.push(key);
+    }
+
+    pub fn set_is_plus(&mut self, is_plus: bool) {
+        self.is_plus = is_plus;
     }
 }
 

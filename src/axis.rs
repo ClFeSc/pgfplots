@@ -1,3 +1,4 @@
+use crate::axis::plot::coordinate::Coordinate;
 use crate::axis::plot::Plot2D;
 use std::fmt;
 
@@ -62,7 +63,7 @@ impl fmt::Display for AxisKey {
 /// # fn main() -> Result<(), ShowPdfError> {
 /// use pgfplots::{axis::Axis, Engine, Picture};
 ///
-/// let mut axis = Axis::new();
+/// let mut axis = Axis::<f64, f64>::new();
 /// axis.set_title("Picture of $\\gamma$ rays");
 /// axis.set_x_label("$x$~[m]");
 /// axis.set_y_label("$y$~[m]");
@@ -72,12 +73,12 @@ impl fmt::Display for AxisKey {
 /// # }
 /// ```
 #[derive(Clone, Debug, Default)]
-pub struct Axis {
+pub struct Axis<X: Coordinate, Y: Coordinate> {
     keys: Vec<AxisKey>,
-    pub plots: Vec<Plot2D>,
+    pub plots: Vec<Plot2D<X, Y>>,
 }
 
-impl fmt::Display for Axis {
+impl<X: Coordinate, Y: Coordinate> fmt::Display for Axis<X, Y> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "\\begin{{axis}}")?;
         // If there are keys, print one per line. It makes it easier for a
@@ -101,15 +102,15 @@ impl fmt::Display for Axis {
     }
 }
 
-impl From<Plot2D> for Axis {
-    fn from(plot: Plot2D) -> Self {
+impl<X: Coordinate, Y: Coordinate> From<Plot2D<X, Y>> for Axis<X, Y> {
+    fn from(plot: Plot2D<X, Y>) -> Self {
         Axis {
             keys: Vec::new(),
             plots: vec![plot],
         }
     }
 }
-impl Axis {
+impl<X: Coordinate, Y: Coordinate> Axis<X, Y> {
     /// Creates a new, empty axis environment.
     ///
     /// # Examples
@@ -117,7 +118,7 @@ impl Axis {
     /// ```
     /// use pgfplots::axis::Axis;
     ///
-    /// let axis = Axis::new();
+    /// let axis = Axis::<f64, f64>::new();
     /// ```
     pub fn new() -> Self {
         Default::default()
@@ -130,7 +131,7 @@ impl Axis {
     /// ```
     /// use pgfplots::axis::Axis;
     ///
-    /// let mut axis = Axis::new();
+    /// let mut axis = Axis::<f64, f64>::new();
     /// axis.set_title("My plot: $y = x^2$");
     /// ```
     pub fn set_title<S: Into<String>>(&mut self, title: S) {
@@ -143,7 +144,7 @@ impl Axis {
     /// ```
     /// use pgfplots::axis::Axis;
     ///
-    /// let mut axis = Axis::new();
+    /// let mut axis = Axis::<f64, f64>::new();
     /// axis.set_x_label("$x$~[m]");
     /// ```
     pub fn set_x_label<S: Into<String>>(&mut self, label: S) {
@@ -156,7 +157,7 @@ impl Axis {
     /// ```
     /// use pgfplots::axis::Axis;
     ///
-    /// let mut axis = Axis::new();
+    /// let mut axis = Axis::<f64, f64>::new();
     /// axis.set_y_label("$y$~[m]");
     /// ```
     pub fn set_y_label<S: Into<String>>(&mut self, label: S) {
@@ -170,7 +171,7 @@ impl Axis {
     /// ```
     /// use pgfplots::axis::{Axis, AxisKey, Scale::Log};
     ///
-    /// let mut axis = Axis::new();
+    /// let mut axis = Axis::<f64, f64>::new();
     /// axis.add_key(AxisKey::YMode(Log));
     /// ```
     pub fn add_key(&mut self, key: AxisKey) {
